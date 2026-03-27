@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ocean-lightest: #e8f7f9;
+  --ocean-light: #b8e8f0;
+  --ocean-mid: #6ec6d8;
+  --ocean-deep: #3a9ab5;
+  --coral: #f06b8a;
+  --seaweed: #5aab7a;
+  --sand: #f5e6c8;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html, body {
+  overscroll-behavior: none;
+  background: var(--ocean-lightest);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ocean-lightest);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ocean-mid);
+  border-radius: 3px;
+}
+
+/* Bubble elements */
+.bubble {
+  position: fixed;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(110,198,216,0.2));
+  border: 1px solid rgba(255,255,255,0.5);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Watercolor letter style */
+.watercolor-text {
+  background: linear-gradient(135deg, #7b9fd4 0%, #6ec6d8 30%, #5aab7a 60%, #3a9ab5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(58,154,181,0.3));
+}
+
+/* Ocean wave divider */
+.wave-divider {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+/* Glass card effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* iOS-optimized input */
+input[type="text"],
+input[type="file"],
+textarea {
+  font-size: 16px !important; /* Prevents zoom on iOS */
+}
+
+/* Embla carousel */
+.embla {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+  align-items: flex-start; /* slides align from top, heights vary per orientation */
+}
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+/* Animated seaweed */
+@keyframes sway {
+  0%, 100% { transform-origin: bottom center; transform: rotate(-8deg); }
+  50% { transform-origin: bottom center; transform: rotate(8deg); }
+}
+
+.seaweed-sway {
+  animation: sway 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.seaweed-sway-delay {
+  animation: sway 4s ease-in-out infinite 1s;
+  transform-origin: bottom center;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.6) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ── Plant & seaweed sway animations ── */
+@keyframes plant-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50%       { transform: rotate(6deg); }
+}
+@keyframes plant-sway-slow {
+  0%, 100% { transform: rotate(-4deg); }
+  50%       { transform: rotate(4deg); }
+}
+@keyframes plant-sway-delay {
+  0%, 100% { transform: rotate(-8deg); }
+  50%       { transform: rotate(8deg); }
+}
+@keyframes plant-sway-right {
+  0%, 100% { transform: scaleX(-1) rotate(-6deg); }
+  50%       { transform: scaleX(-1) rotate(6deg); }
+}
+/* Coral gentle bob */
+@keyframes coral-bob {
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50%       { transform: translateY(-5px) rotate(2deg); }
+}
+@keyframes coral-bob-r {
+  0%, 100% { transform: translateY(0px) rotate(2deg); }
+  50%       { transform: translateY(-6px) rotate(-2deg); }
+}
+/* Alga flowing wave */
+@keyframes alga-wave {
+  0%   { transform: skewX(0deg) rotate(-3deg); }
+  25%  { transform: skewX(3deg) rotate(0deg); }
+  50%  { transform: skewX(0deg) rotate(3deg); }
+  75%  { transform: skewX(-3deg) rotate(0deg); }
+  100% { transform: skewX(0deg) rotate(-3deg); }
+}
+@keyframes alga-wave-r {
+  0%   { transform: scaleX(-1) skewX(0deg) rotate(-3deg); }
+  25%  { transform: scaleX(-1) skewX(-3deg) rotate(0deg); }
+  50%  { transform: scaleX(-1) skewX(0deg) rotate(3deg); }
+  75%  { transform: scaleX(-1) skewX(3deg) rotate(0deg); }
+  100% { transform: scaleX(-1) skewX(0deg) rotate(-3deg); }
+}
+
+.plant-sway        { animation: plant-sway 3.4s ease-in-out infinite; transform-origin: bottom center; }
+.plant-sway-slow   { animation: plant-sway-slow 5s ease-in-out infinite; transform-origin: bottom center; }
+.plant-sway-delay  { animation: plant-sway-delay 2.8s ease-in-out infinite 0.6s; transform-origin: bottom center; }
+.plant-sway-right  { animation: plant-sway-right 3.8s ease-in-out infinite; transform-origin: bottom center; }
+.coral-bob         { animation: coral-bob 4s ease-in-out infinite; transform-origin: bottom center; }
+.coral-bob-delay   { animation: coral-bob 4.5s ease-in-out infinite 1.2s; transform-origin: bottom center; }
+.coral-bob-r       { animation: coral-bob-r 5s ease-in-out infinite 0.5s; transform-origin: bottom center; }
+.alga-wave         { animation: alga-wave 5s ease-in-out infinite; transform-origin: bottom center; }
+.alga-wave-delay   { animation: alga-wave 6s ease-in-out infinite 1.5s; transform-origin: bottom center; }
+.alga-wave-r       { animation: alga-wave-r 5.5s ease-in-out infinite 0.8s; transform-origin: bottom center; }
+
+/* Swimming fish animations */
+@keyframes swim {
+  0%   { transform: translateX(-160px); }
+  100% { transform: translateX(calc(100vw + 160px)); }
+}
+@keyframes swim2 {
+  0%   { transform: translateX(calc(100vw + 120px)) scaleX(-1); }
+  100% { transform: translateX(-120px) scaleX(-1); }
+}
+
+/* Bottom safe area for iPhone */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 20px);
+}
