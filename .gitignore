@@ -1,3 +1,6 @@
 node_modules/ 
 .next/ 
 .env 
+# Base de datos
+supabase-setup.sql
+*.sql
