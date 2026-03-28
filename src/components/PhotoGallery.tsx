@@ -69,7 +69,8 @@ function PhotoSlide({ src, index, isActive }: { src: string; index: number; isAc
   const bg      = SLIDE_BG[index % SLIDE_BG.length]
   const animal  = PLACEHOLDER_ANIMALS[index % PLACEHOLDER_ANIMALS.length]
   // Extract filename without extension as caption fallback
-  const caption = src.split('/').pop()?.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') ?? `Foto ${index + 1}`
+  //const caption = src.split('/').pop()?.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') ?? `Foto ${index + 1}`
+  const caption = ""
 
   return (
     <div className="relative w-full h-full" style={{ background: bg }}>
