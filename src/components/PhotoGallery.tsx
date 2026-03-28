@@ -22,6 +22,9 @@ const SLIDE_BG = ['#3a9ab5','#5aab7a','#c85040','#6ec6d8','#1d6d87','#e8805a','#
 // ── Animals filling the top/bottom bands of landscape photos ──
 const TOP_ANIMALS    = ['/animals/estrella_De_mar.png', '/animals/medusa.png',   '/animals/pez_color.png']
 const BOTTOM_ANIMALS = ['/animals/cangrejo.png',        '/animals/seahorse.png', '/animals/erizo_de_mar.png']
+// ── NUEVO: Animals filling the left/right bands of portrait photos ──
+const LEFT_ANIMALS   = ['/animals/pulpo.png', '/animals/langosta.png', '/animals/pez_nemo.png']
+const RIGHT_ANIMALS  = ['/animals/ballena.png', '/animals/tortuga.png', '/animals/pez_pecas.png']
 
 function TopBottomAnimals({ idx }: { idx: number }) {
   // Función auxiliar para obtener 3 animales distintos basados en el índice de la slide
@@ -71,59 +74,130 @@ function TopBottomAnimals({ idx }: { idx: number }) {
     </>
   )
 }
+function LeftRightAnimals({ idx }: { idx: number }) {
+  // Función auxiliar para obtener animales distintos (misma lógica que la anterior)
+  const getDistinctAnimals = (sourceArray: string[], slideIdx: number) => {
+    return [0, 1, 2].map((pos) => {
+      const animalIdx = (slideIdx + pos) % sourceArray.length;
+      return sourceArray[animalIdx];
+    });
+  };
 
-// ── Single slide ──
-function PhotoSlide({ src, index, isActive }: { src: string; index: number; isActive: boolean }) {
-  const [loaded,      setLoaded]      = useState(false)
-  const [error,       setError]       = useState(false)
-  const [isLandscape, setIsLandscape] = useState(false)
+  const leftColumn  = getDistinctAnimals(LEFT_ANIMALS, idx);
+  const rightColumn = getDistinctAnimals(RIGHT_ANIMALS, idx);
 
-  const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget
-    setIsLandscape(img.naturalWidth > img.naturalHeight)
-    setLoaded(true)
-  }
-
-  const bg      = SLIDE_BG[index % SLIDE_BG.length]
-  const animal  = PLACEHOLDER_ANIMALS[index % PLACEHOLDER_ANIMALS.length]
-  // Extract filename without extension as caption fallback
-  //const caption = src.split('/').pop()?.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') ?? `Foto ${index + 1}`
-  const caption = ""
+  // Estilo base para las columnas laterales
+  const columnStyle = "absolute top-0 bottom-0 z-10 pointer-events-none flex flex-col items-center justify-around py-12";
 
   return (
-    // Dentro de PhotoSlide
-<div className="absolute inset-0 w-full h-full" style={{ 
+    <>
+      {/* Columna Izquierda */}
+      <div className={`${columnStyle} left-0`}
+        style={{ width: '22%', background: 'linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 100%)' }}>
+        {leftColumn.map((src, i) => (
+          <motion.div key={`left-${i}`}
+            // Movimiento lateral suave
+            animate={{ x: [0, 6, 0] }}
+            transition={{ duration: 4 + i * 0.5, repeat: Infinity, delay: i * 0.7, ease: 'easeInOut' }}>
+            <Image src={src} alt="" width={52} height={52}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(2px 3px 6px rgba(0,0,0,0.3))' }} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Columna Derecha */}
+      <div className={`${columnStyle} right-0`}
+        style={{ width: '22%', background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 100%)' }}>
+        {rightColumn.map((src, i) => (
+          <motion.div key={`right-${i}`}
+            // Movimiento lateral suave (inverso)
+            animate={{ x: [0, -6, 0] }}
+            transition={{ duration: 3.8 + i * 0.6, repeat: Infinity, delay: i * 0.8, ease: 'easeInOut' }}>
+            <Image src={src} alt="" width={52} height={52}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(-2px 3px 6px rgba(0,0,0,0.3))' }} />
+          </motion.div>
+        ))}
+      </div>
+    </>
+  )
+}
+// ── Single slide ──
+// ── Single slide ──
+function PhotoSlide({ src, index, isActive }: { src: string; index: number; isActive: boolean }) {
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  
+  // Estados para detectar qué márgenes se crean
+  const [showTopBottom, setShowTopBottom] = useState(false)
+  const [showLeftRight, setShowLeftRight] = useState(false)
+
+  const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const container = img.parentElement;
+    if (!container) return;
+
+    // Proporciones (Ancho / Alto)
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    const containerRatio = container.offsetWidth / container.offsetHeight;
+
+    // Si la foto es más ancha que el contenedor -> márgenes ARRIBA/ABAJO
+    if (imgRatio > containerRatio) {
+      setShowTopBottom(true);
+      setShowLeftRight(false);
+    } 
+    // Si la foto es más alta que el contenedor -> márgenes IZQUIERDA/DERECHA
+    else if (imgRatio < containerRatio) {
+      setShowTopBottom(false);
+      setShowLeftRight(true);
+    } 
+    // Si son iguales (o casi) -> no mostramos animales extra
+    else {
+      setShowTopBottom(false);
+      setShowLeftRight(false);
+    }
+
+    setLoaded(true);
+  }
+
+  const bg = SLIDE_BG[index % SLIDE_BG.length]
+  const animal = PLACEHOLDER_ANIMALS[index % PLACEHOLDER_ANIMALS.length]
+  const caption = "" // Mantenemos el caption vacío como pediste
+
+  return (
+    // Div con los fixes para iPhone que aplicamos antes
+    <div className="absolute inset-0 w-full h-full" style={{ 
       background: bg,
       display: 'flex',
-      flexDirection: 'column', // Asegura que los elementos se apilen verticalmente sin desbordar
+      alignItems: 'center',
+      justifyContent: 'center',
       overflow: 'hidden'
     }}>
 
-      {/* Top/bottom animals for landscape photos — detected automatically */}
-      {isLandscape && loaded && !error && <TopBottomAnimals idx={index} />}
+      {/* Condicionales para mostrar los animales según la forma de la foto */}
+      {loaded && !error && showTopBottom && <TopBottomAnimals idx={index} />}
+      {loaded && !error && showLeftRight && <LeftRightAnimals idx={index} />}
 
-      {/* Real photo */}
+      {/* Real photo (con los fixes para iPhone) */}
       {!error && (
-  <Image
-    src={src}
-    alt={caption}
-    fill
-    sizes="(max-width: 768px) 100vw, 700px"
-    priority={index === 0}
-    className="m-0 p-0" // <--- Elimina cualquier margen/padding residual
-    style={{ 
-      objectFit: 'contain', 
-      objectPosition: 'center',
-      top: 0,     // <--- Forzado manual de coordenadas
-      left: 0,
-      width: '100%',
-      height: '100%'
-    }}
-    onLoad={handleLoad}
-    onError={() => setError(true)}
-  />
-)}
+        <Image
+          src={src}
+          alt={caption}
+          fill
+          sizes="(max-width: 768px) 100vw, 700px"
+          priority={index === 0}
+          className="m-0 p-0 top-0 left-0" 
+          style={{ 
+            objectFit: 'contain', 
+            objectPosition: 'center',
+            width: '100%',
+            height: '100%'
+          }}
+          onLoad={handleLoad}
+          onError={() => setError(true)}
+        />
+      )}
 
+      {/* ... (resto del código igual: Placeholder, Caption bar, Active shimmer) ... */}
       {/* Placeholder while loading */}
       {(!loaded || error) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-20">
@@ -140,7 +214,7 @@ function PhotoSlide({ src, index, isActive }: { src: string; index: number; isAc
       )}
 
       {/* Caption bar */}
-      {loaded && !error && (
+      {loaded && !error && caption && (
         <div className="absolute bottom-0 left-0 right-0 px-4 py-3 z-20"
           style={{ background: 'linear-gradient(to top,rgba(13,74,98,0.72) 0%,transparent 100%)' }}>
           <p className="font-bubble font-bold text-base text-white text-center"
