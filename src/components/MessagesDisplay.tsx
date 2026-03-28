@@ -56,74 +56,88 @@ export default function MessagesDisplay({ refresh }: { refresh: number }) {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-bubble font-bold text-2xl text-center" style={{ color: '#1d6d87' }}>
+    <div className="relative w-full overflow-hidden">
+      <h2 className="font-bubble font-bold text-2xl text-center mb-4" style={{ color: '#1d6d87' }}>
         💌 Mensajitos con amor
       </h2>
-      <AnimatePresence>
-     {messages.map((msg, i) => (
-          <motion.div
-            key={msg.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="rounded-3xl overflow-hidden relative shadow-lg"
-            style={{
-              background: 'rgba(255,255,255,0.7)',
-              backdropFilter: 'blur(10px)',
-              border: '1.5px solid rgba(255,255,255,0.8)',
-            }}
-          >
-            <div className="relative w-full flex flex-col">
-              {/* Bloque de Imagen */}
-              {msg.photo_url ? (
-                <div className="relative w-full aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={msg.photo_url}
-                    alt={msg.guest_name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                  {/* Overlay para "Subtítulos" */}
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-t from-[#0d4a62]/90 via-[#0d4a62]/40 to-transparent z-10" 
-                  />
-                </div>
-              ) : (
-                <div className="pt-8 pb-2 text-center text-3xl opacity-20">🌊</div>
-              )}
+      
+      {/* Contenedor de Scroll Lateral Optimizado para iOS */}
+      <div 
+        className="flex overflow-x-auto gap-4 pb-8 px-4 hide-scrollbar snap-x snap-mandatory"
+        style={{ 
+          WebkitOverflowScrolling: 'touch', 
+          scrollBehavior: 'smooth',
+          display: 'flex'
+        }}
+      >
+        <AnimatePresence>
+          {messages.map((msg, i) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05 }}
+              // flex-shrink-0 y w-[85vw] permiten que se asome la siguiente tarjeta
+              className="flex-shrink-0 w-[85vw] max-w-[320px] snap-center rounded-3xl overflow-hidden relative shadow-lg"
+              style={{
+                background: 'rgba(255,255,255,0.7)',
+                backdropFilter: 'blur(10px)',
+                border: '1.5px solid rgba(255,255,255,0.8)',
+                transform: 'translateZ(0)' // Mejora rendimiento en Safari
+              }}
+            >
+              <div className="relative w-full flex flex-col">
+                {msg.photo_url ? (
+                  <div className="relative w-full aspect-[3/4] overflow-hidden">
+                    <Image
+                      src={msg.photo_url}
+                      alt={msg.guest_name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d4a62]/90 via-[#0d4a62]/20 to-transparent z-10" />
+                  </div>
+                ) : (
+                  <div className="h-[180px] flex items-center justify-center text-3xl opacity-20 bg-white/30">🌊</div>
+                )}
 
-              {/* Contenedor de Texto */}
-              <div className={msg.photo_url ? "absolute bottom-0 left-0 right-0 z-20 p-5" : "relative p-5"}>
-                <p 
-                  className={`text-center italic mb-4 font-medium ${msg.photo_url ? 'text-white' : 'text-[#0d4a62]'}`}
-                  style={{ textShadow: msg.photo_url ? '0 2px 4px rgba(0,0,0,0.5)' : 'none' }}
-                >
-                  "{msg.message}"
-                </p>
+                <div className={msg.photo_url ? "absolute bottom-0 left-0 right-0 z-20 p-5" : "relative p-5"}>
+                  <p 
+                    className={`text-center italic mb-4 font-medium leading-tight ${msg.photo_url ? 'text-white' : 'text-[#0d4a62]'}`}
+                    style={{ textShadow: msg.photo_url ? '0 2px 4px rgba(0,0,0,0.5)' : 'none' }}
+                  >
+                    "{msg.message}"
+                  </p>
 
-                <div 
-                  className="flex items-center justify-between pt-3 border-t"
-                  style={{ borderColor: msg.photo_url ? 'rgba(255,255,255,0.2)' : 'rgba(110,198,216,0.3)' }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#6ec6d8] to-[#3a9ab5] flex items-center justify-center text-white text-xs font-bold">
-                      {msg.guest_name.charAt(0).toUpperCase()}
+                  <div className="flex items-center justify-between pt-3 border-t border-white/20">
+                    <div className="flex items-center gap-2 text-left">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#6ec6d8] to-[#3a9ab5] flex items-center justify-center text-white text-xs font-bold">
+                        {msg.guest_name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className={`font-bold text-sm ${msg.photo_url ? 'text-white' : 'text-[#1d6d87]'}`}>
+                        {msg.guest_name}
+                      </span>
                     </div>
-                    <span className={`font-bold text-sm ${msg.photo_url ? 'text-white' : 'text-[#1d6d87]'}`}>
-                      {msg.guest_name}
+                    <span className={`text-[10px] ${msg.photo_url ? 'text-white/70' : 'text-[#6ec6d8]'}`}>
+                      {new Date(msg.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
                     </span>
                   </div>
-                  <span className={`text-[10px] ${msg.photo_url ? 'text-white/70' : 'text-[#6ec6d8]'}`}>
-                    {new Date(msg.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
-                  </span>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        
+        {/* Espaciador final para que la última tarjeta no se corte en Safari */}
+        <div className="flex-shrink-0 w-4" />
+      </div>
+
+      {/* Estilos para ocultar la barra de scroll */}
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   )
 }
