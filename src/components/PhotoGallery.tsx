@@ -14,39 +14,61 @@ const GALLERY_PHOTOS = [
   { src: '/photos/photo5.jpg', caption: 'Mis juguetes 🦀',       placeholderAnimal: '/animals/pulpo.png',     bg: '#5aab7a', portrait: false },
 ]
 
-// Animals shown on the sides of landscape photos to fill vertical space
-const SIDE_PAIRS = [
-  ['/animals/estrella_De_mar.png', '/animals/cangrejo.png'],
-  ['/animals/medusa.png',          '/animals/seahorse.png'],
-  ['/animals/erizo_de_mar.png',    '/animals/pez_color.png'],
-]
+// Animals shown TOP and BOTTOM for landscape photos (2048×1363)
+// because landscape fits within portrait container with bands above and below
+const TOP_ANIMALS    = ['/animals/estrella_De_mar.png', '/animals/medusa.png',   '/animals/pez_color.png']
+const BOTTOM_ANIMALS = ['/animals/cangrejo.png',        '/animals/seahorse.png', '/animals/erizo_de_mar.png']
 
-function SideAnimals({ photoIndex }: { photoIndex: number }) {
-  const pair = SIDE_PAIRS[photoIndex % SIDE_PAIRS.length]
+function TopBottomAnimals({ photoIndex }: { photoIndex: number }) {
+  const topAnimal    = TOP_ANIMALS[photoIndex % TOP_ANIMALS.length]
+  const bottomAnimal = BOTTOM_ANIMALS[photoIndex % BOTTOM_ANIMALS.length]
   return (
     <>
-      {/* Left animal */}
-      <motion.div
-        className="absolute z-10 pointer-events-none"
-        style={{ left: '6px', top: '50%', transform: 'translateY(-50%)' }}
-        animate={{ y: ['-45%', '-55%', '-45%'] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+      {/* Top band */}
+      <div
+        className="absolute left-0 right-0 z-10 pointer-events-none flex items-center justify-around px-6"
+        style={{
+          top: 0,
+          // band height = half the letterbox gap
+          // container is 1363/2048 tall, photo is 2048/1363 wide
+          // gap each side = (1 - (1363/2048)/(2048/1363)) / 2 × 100%
+          // = (1 - (1363²/2048²)) / 2 = (1 - 0.443) / 2 ≈ 27.9% each
+          height: '27%',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 100%)',
+        }}
       >
-        <Image src={pair[0]} alt="" width={64} height={64}
-          style={{ objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
-        />
-      </motion.div>
-      {/* Right animal */}
-      <motion.div
-        className="absolute z-10 pointer-events-none"
-        style={{ right: '6px', top: '50%', transform: 'translateY(-50%)' }}
-        animate={{ y: ['-55%', '-45%', '-55%'] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+        {[0, 1, 2].map((i) => (
+          <motion.div key={i}
+            animate={{ y: [0, -7, 0] }}
+            transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.9, ease: 'easeInOut' }}
+          >
+            <Image src={topAnimal} alt="" width={56} height={56}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Bottom band */}
+      <div
+        className="absolute left-0 right-0 z-10 pointer-events-none flex items-center justify-around px-6"
+        style={{
+          bottom: 0,
+          height: '27%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 100%)',
+        }}
       >
-        <Image src={pair[1]} alt="" width={64} height={64}
-          style={{ objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))', transform: 'scaleX(-1)' }}
-        />
-      </motion.div>
+        {[0, 1, 2].map((i) => (
+          <motion.div key={i}
+            animate={{ y: [0, 7, 0] }}
+            transition={{ duration: 3.5 + i * 0.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }}
+          >
+            <Image src={bottomAnimal} alt="" width={56} height={56}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}
+            />
+          </motion.div>
+        ))}
+      </div>
     </>
   )
 }
@@ -62,9 +84,9 @@ function PhotoSlide({ photo, isActive, index }: {
   return (
     <div className="relative w-full h-full" style={{ background: photo.bg }}>
 
-      {/* Side animals only for landscape photos (fill the vertical space) */}
+      {/* Top/bottom animals only for LANDSCAPE photos (2048×1363) */}
       {!photo.portrait && loaded && !error && (
-        <SideAnimals photoIndex={index} />
+        <TopBottomAnimals photoIndex={index} />
       )}
 
       {/* Real photo */}
@@ -127,11 +149,11 @@ function PhotoSlide({ photo, isActive, index }: {
 }
 
 export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
-  // Height = portrait aspect ratio 1064:1600
-  // padding-top trick: height = width × (1600/1064) BUT capped so it doesn't overflow
-  // Use aspect-ratio CSS property — portrait 1064/1600
-  // We want the CONTAINER to be portrait-shaped so both orientations fit inside
-  const PORTRAIT_RATIO = 1600 / 1064   // ≈ 1.504  → height is 150.4% of width
+  // Container uses portrait aspect ratio 1363:2048
+  // → height = width × (2048/1363) ≈ 1.503
+  // Portrait photos (1363×2048) fill it exactly.
+  // Landscape photos (2048×1363) are contained with side animals filling the bands.
+  const PORTRAIT_RATIO = 2048 / 1363   // kept for reference, not used in JSX directly
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -195,7 +217,7 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
       {/*
         CAROUSEL WRAPPER
         ─────────────────
-        aspect-ratio: 1064 / 1600  → tall portrait shape
+        aspect-ratio: 1363 / 2048  → portrait shape (1363×2048 photos)
         max-height: 72dvh           → never taller than 72% of viewport on any iPhone
         The Embla root fills this box 100%.
         Slides also fill 100% height.
@@ -204,7 +226,7 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
       <div
         style={{
           width: '100%',
-          aspectRatio: '1064 / 1600',
+          aspectRatio: '1363 / 2048',
           maxHeight: '72dvh',
           position: 'relative',
           borderRadius: '20px',
