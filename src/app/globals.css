@@ -83,11 +83,13 @@ textarea {
 }
 .embla__container {
   display: flex;
-  align-items: flex-start; /* slides align from top, heights vary per orientation */
+  align-items: stretch; /* all slides same height */
+  height: 100%;
 }
 .embla__slide {
   flex: 0 0 100%;
   min-width: 0;
+  height: 100%;
 }
 
 /* Animated seaweed */

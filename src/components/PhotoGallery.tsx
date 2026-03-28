@@ -2,49 +2,86 @@
 
 import useEmblaCarousel from 'embla-carousel-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { sfx } from '@/lib/audio'
 
-// Photo metadata — set `portrait: true` for 1064×1600, leave false for 1600×1064
-// The slide container adapts its aspect-ratio automatically per photo.
+// portrait: true  → 1064×1600 (tall) — container fills sides with animals
+// portrait: false → 1600×1064 (wide) — fills the frame exactly
 const GALLERY_PHOTOS = [
-  { src: '/photos/photo1.jpg', caption: '¡Hola mundo! 🌊', placeholderAnimal: '/animals/ballena.png', bg: 'linear-gradient(135deg,#6ec6d8,#3a9ab5)', portrait: false },
-  { src: '/photos/photo2.jpg', caption: 'Mi primer baño 🛁', placeholderAnimal: '/animals/tortuga.png', bg: 'linear-gradient(135deg,#5aab7a,#3a9ab5)', portrait: true },
-  { src: '/photos/photo3.jpg', caption: 'Primera sonrisita 😊', placeholderAnimal: '/animals/pez_nemo.png', bg: 'linear-gradient(135deg,#e8805a,#c85040)', portrait: false },
-  { src: '/photos/photo4.jpg', caption: '¡Ya casi camino! 👟', placeholderAnimal: '/animals/pez_pecas.png', bg: 'linear-gradient(135deg,#a8ddd6,#6ec6d8)', portrait: true },
-  { src: '/photos/photo5.jpg', caption: 'Mis juguetes 🦀', placeholderAnimal: '/animals/pulpo.png', bg: 'linear-gradient(135deg,#b8e8f0,#5aab7a)', portrait: false },
+  { src: '/photos/photo1.jpg', caption: '¡Hola mundo! 🌊',       placeholderAnimal: '/animals/ballena.png',   bg: 'linear-gradient(135deg,#6ec6d8,#3a9ab5)', portrait: false },
+  { src: '/photos/photo2.jpg', caption: 'Mi primer baño 🛁',      placeholderAnimal: '/animals/tortuga.png',   bg: 'linear-gradient(135deg,#5aab7a,#3a9ab5)', portrait: true  },
+  { src: '/photos/photo3.jpg', caption: 'Primera sonrisita 😊',   placeholderAnimal: '/animals/pez_nemo.png',  bg: 'linear-gradient(135deg,#e8805a,#c85040)', portrait: false },
+  { src: '/photos/photo4.jpg', caption: '¡Ya casi camino! 👟',    placeholderAnimal: '/animals/pez_pecas.png', bg: 'linear-gradient(135deg,#a8ddd6,#6ec6d8)', portrait: true  },
+  { src: '/photos/photo5.jpg', caption: 'Mis juguetes 🦀',        placeholderAnimal: '/animals/pulpo.png',     bg: 'linear-gradient(135deg,#b8e8f0,#5aab7a)', portrait: false },
 ]
 
-// Tallest portrait aspect ratio is 1064:1600 ≈ 0.665
-// Widest landscape is 1600:1064 ≈ 1.504
-// We cap portrait slides so they don't exceed 80vh on small screens.
+// Animals placed as side decoration for portrait photos
+// Each side gets a stack of floaty animals
+const LEFT_ANIMALS  = ['/animals/estrella_De_mar.png', '/animals/medusa.png',  '/animals/erizo_de_mar.png']
+const RIGHT_ANIMALS = ['/animals/cangrejo.png',        '/animals/pez_color.png', '/animals/seahorse.png']
 
-function PhotoSlide({
-  photo, isActive, index,
-}: {
+// Floating animation delays
+const FLOAT_DELAYS = [0, 1.2, 2.4]
+
+function SideAnimals({ side }: { side: 'left' | 'right' }) {
+  const animals = side === 'left' ? LEFT_ANIMALS : RIGHT_ANIMALS
+  return (
+    <div
+      className="absolute top-0 bottom-0 flex flex-col items-center justify-around py-4 z-10"
+      style={{
+        [side]: 0,
+        width: '22%',
+        background: side === 'left'
+          ? 'linear-gradient(to right, rgba(0,0,0,0.18) 0%, transparent 100%)'
+          : 'linear-gradient(to left,  rgba(0,0,0,0.18) 0%, transparent 100%)',
+        pointerEvents: 'none',
+      }}
+    >
+      {animals.map((src, i) => (
+        <motion.div
+          key={i}
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 3 + i * 0.8, repeat: Infinity, delay: FLOAT_DELAYS[i], ease: 'easeInOut' }}
+        >
+          <Image
+            src={src}
+            alt="animal marino"
+            width={52}
+            height={52}
+            style={{
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))',
+              transform: side === 'right' ? 'scaleX(-1)' : 'none',
+            }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
+function PhotoSlide({ photo, isActive, index }: {
   photo: typeof GALLERY_PHOTOS[0]
   isActive: boolean
   index: number
 }) {
   const [loaded, setLoaded] = useState(false)
-  const [error, setError] = useState(false)
+  const [error,  setError]  = useState(false)
 
   return (
-    <div
-      className="relative w-full"
-      style={{
-        // Dynamic aspect ratio per orientation
-        //aspectRatio: photo.portrait ? '1064 / 1600' : '1600 / 1064',
-        // Never taller than 80dvh so portrait shots stay within screen on iPhone
-        height: '1600px',
-        maxHeight: '80dvh',
-        background: photo.bg,
-        borderRadius: '20px',
-        overflow: 'hidden',
-      }}
-    >
-      {/* ── Real photo (object-fit: contain — never clips) ── */}
+    // Frame fills 100% of the fixed-height container
+    <div className="relative w-full h-full" style={{ background: photo.bg }}>
+
+      {/* ── Side animals only for portrait shots ── */}
+      {photo.portrait && loaded && !error && (
+        <>
+          <SideAnimals side="left" />
+          <SideAnimals side="right" />
+        </>
+      )}
+
+      {/* ── Real photo ── */}
       {!error && (
         <Image
           src={photo.src}
@@ -52,8 +89,10 @@ function PhotoSlide({
           fill
           sizes="(max-width: 768px) 100vw, 600px"
           style={{
-            objectFit: 'contain',   // whole photo always visible
+            // portrait: contain so nothing clips, landscape: cover to fill
+            objectFit: photo.portrait ? 'contain' : 'cover',
             objectPosition: 'center center',
+            // portrait photo sits in center; side animals fill the gaps
           }}
           priority={index === 0}
           onLoad={() => setLoaded(true)}
@@ -61,36 +100,35 @@ function PhotoSlide({
         />
       )}
 
-      {/* ── Placeholder shown while loading or on error ── */}
+      {/* ── Placeholder while loading / error ── */}
       {(!loaded || error) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-20">
           <motion.div
-            animate={{ y: isActive ? [0, -10, 0] : 0 }}
+            animate={{ y: isActive ? [0, -12, 0] : 0 }}
             transition={{ duration: 3, repeat: isActive ? Infinity : 0, ease: 'easeInOut' }}
           >
             <Image
               src={photo.placeholderAnimal}
               alt={photo.caption}
-              width={140}
-              height={120}
-              style={{ objectFit: 'contain', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.2))' }}
+              width={150}
+              height={130}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.22))' }}
             />
           </motion.div>
-          <p className="font-bubble font-bold text-lg text-white text-center px-6"
-            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
+          <p className="font-bubble font-bold text-xl text-white text-center px-8"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
             {photo.caption}
           </p>
-          <p className="text-white/60 text-sm font-body">Foto #{index + 1}</p>
+          <p className="text-white/60 text-sm">Foto #{index + 1}</p>
         </div>
       )}
 
-      {/* ── Caption overlay shown once photo loads ── */}
+      {/* ── Caption gradient at bottom ── */}
       {loaded && !error && (
         <div
-          className="absolute bottom-0 left-0 right-0 px-4 py-3"
+          className="absolute bottom-0 left-0 right-0 px-4 py-3 z-20"
           style={{
-            background: 'linear-gradient(to top, rgba(13,74,98,0.65) 0%, transparent 100%)',
-            borderRadius: '0 0 20px 20px',
+            background: 'linear-gradient(to top, rgba(13,74,98,0.7) 0%, transparent 100%)',
           }}
         >
           <p className="font-bubble font-bold text-base text-white text-center"
@@ -100,27 +138,44 @@ function PhotoSlide({
         </div>
       )}
 
-      {/* ── Shimmer on active slide ── */}
+      {/* ── Active shimmer ── */}
       {isActive && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(45deg,transparent 30%,rgba(255,255,255,0.08) 50%,transparent 70%)',
-            backgroundSize: '200% 100%',
-            animation: 'shimmer 3s infinite',
-          }}
-        />
+        <div className="absolute inset-0 pointer-events-none z-10" style={{
+          background: 'linear-gradient(45deg,transparent 30%,rgba(255,255,255,0.07) 50%,transparent 70%)',
+          backgroundSize: '200% 100%',
+          animation: 'shimmer 4s infinite',
+        }}/>
       )}
     </div>
   )
 }
 
 export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center', skipSnaps: false })
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  // Fixed height = landscape ratio of 1600×1064 relative to device width
+  // We compute this as a CSS value: (1064/1600)*100vw capped at a max
+  // Implemented via padding-top trick so it's truly responsive
+  const ASPECT = 1064 / 1600   // ≈ 0.665 → height is 66.5% of width
 
-  const scrollPrev = useCallback(() => { sfx.slide(); emblaApi?.scrollPrev(); onNav?.() }, [emblaApi, onNav])
-  const scrollNext = useCallback(() => { sfx.slide(); emblaApi?.scrollNext(); onNav?.() }, [emblaApi, onNav])
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    skipSnaps: false,
+    dragFree: false,
+  })
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [autoplay, setAutoplay] = useState(true)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      emblaApi?.canScrollNext() ? emblaApi.scrollNext() : emblaApi?.scrollTo(0)
+    }, 4500)
+  }, [emblaApi])
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
+  }, [])
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
@@ -131,24 +186,25 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
     if (!emblaApi) return
     onSelect()
     emblaApi.on('select', onSelect)
-    // Re-init when slide sizes change (different aspect ratios)
     emblaApi.on('reInit', onSelect)
-
-    const timer = setInterval(() => {
-      emblaApi.canScrollNext() ? emblaApi.scrollNext() : emblaApi.scrollTo(0)
-    }, 4500)
-
+    if (autoplay) startTimer()
     return () => {
-      clearInterval(timer)
+      stopTimer()
       emblaApi.off('select', onSelect)
       emblaApi.off('reInit', onSelect)
     }
-  }, [emblaApi, onSelect])
+  }, [emblaApi, onSelect, autoplay, startTimer, stopTimer])
+
+  const toggleAutoplay = () => {
+    sfx.pop()
+    if (autoplay) { stopTimer(); setAutoplay(false) }
+    else          { setAutoplay(true); startTimer() }
+  }
 
   return (
     <div className="relative w-full">
       {/* Header */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-3">
         <h2 className="font-bubble font-bold text-2xl" style={{ color: '#1d6d87' }}>
           📸 Nuestro álbum del mar
         </h2>
@@ -157,48 +213,48 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
         </p>
       </div>
 
-      {/* Carousel — no fixed height, slides size themselves */}
-      <div className="embla" ref={emblaRef}>
-        <div className="embla__container items-center">
-          {GALLERY_PHOTOS.map((photo, index) => (
-            <div key={index} className="embla__slide" style={{ padding: '0 8px' }}>
-              <motion.div
-                animate={{
-                  scale: index === selectedIndex ? 1 : 0.93,
-                  opacity: index === selectedIndex ? 1 : 0.65,
-                }}
-                transition={{ duration: 0.35 }}
-                style={{
-                  borderRadius: '20px',
-                  boxShadow: index === selectedIndex
-                    ? '0 10px 40px rgba(13,74,98,0.28)'
-                    : '0 4px 16px rgba(13,74,98,0.12)',
-                  border: '3px solid rgba(255,255,255,0.85)',
-                  overflow: 'hidden',
-                  // Let the slide define its own height via aspect-ratio
-                  width: '100%',
-                }}
-              >
-                <PhotoSlide photo={photo} isActive={index === selectedIndex} index={index} />
-              </motion.div>
+      {/* ── Carousel — height derived from landscape aspect ratio ── */}
+      {/* padding-top trick: height = width × (1064/1600) */}
+      <div style={{ position: 'relative', width: '100%', paddingTop: `${ASPECT * 100}%` }}>
+        <div style={{ position: 'absolute', inset: 0 }}>
+          <div
+            className="embla h-full"
+            ref={emblaRef}
+            style={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              boxShadow: '0 10px 40px rgba(13,74,98,0.25)',
+              border: '3px solid rgba(255,255,255,0.85)',
+              height: '100%',
+            }}
+          >
+            <div className="embla__container h-full">
+              {GALLERY_PHOTOS.map((photo, index) => (
+                <div key={index} className="embla__slide h-full">
+                  <motion.div
+                    className="h-full"
+                    animate={{
+                      scale:   index === selectedIndex ? 1    : 0.96,
+                      opacity: index === selectedIndex ? 1    : 0.6,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <PhotoSlide
+                      photo={photo}
+                      isActive={index === selectedIndex}
+                      index={index}
+                    />
+                  </motion.div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-center gap-6 mt-4">
-        <button
-          onClick={scrollPrev}
-          className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
-          style={{
-            background: 'rgba(255,255,255,0.82)',
-            border: '2px solid rgba(110,198,216,0.5)',
-            boxShadow: '0 4px 12px rgba(58,154,181,0.2)',
-            color: '#3a9ab5', fontSize: '22px', fontWeight: 'bold',
-          }}
-        >‹</button>
-
+      {/* ── Controls: dots + play/stop only ── */}
+      <div className="flex items-center justify-center gap-4 mt-4">
+        {/* Dot indicators */}
         <div className="flex gap-2 items-center">
           {GALLERY_PHOTOS.map((_, index) => (
             <button
@@ -206,25 +262,79 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
               onClick={() => { sfx.slide(); emblaApi?.scrollTo(index); onNav?.() }}
               className="rounded-full transition-all duration-300"
               style={{
-                width: index === selectedIndex ? '20px' : '8px',
-                height: '8px',
+                width:      index === selectedIndex ? '20px' : '8px',
+                height:     '8px',
                 background: index === selectedIndex ? '#3a9ab5' : 'rgba(110,198,216,0.4)',
               }}
             />
           ))}
         </div>
 
-        <button
-          onClick={scrollNext}
-          className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
+        {/* Play / Stop button */}
+        <motion.button
+          whileTap={{ scale: 0.88 }}
+          onClick={toggleAutoplay}
+          className="flex items-center justify-center rounded-full ml-2"
           style={{
-            background: 'rgba(255,255,255,0.82)',
-            border: '2px solid rgba(110,198,216,0.5)',
-            boxShadow: '0 4px 12px rgba(58,154,181,0.2)',
-            color: '#3a9ab5', fontSize: '22px', fontWeight: 'bold',
+            width: '44px',
+            height: '44px',
+            background: autoplay
+              ? 'linear-gradient(135deg,#6ec6d8,#3a9ab5)'
+              : 'rgba(255,255,255,0.8)',
+            border: autoplay
+              ? '2px solid rgba(255,255,255,0.5)'
+              : '2px solid rgba(110,198,216,0.5)',
+            boxShadow: autoplay
+              ? '0 4px 14px rgba(58,154,181,0.4)'
+              : '0 4px 12px rgba(58,154,181,0.15)',
           }}
-        >›</button>
+          aria-label={autoplay ? 'Pausar presentación' : 'Reproducir presentación'}
+        >
+          <AnimatePresence mode="wait">
+            {autoplay ? (
+              <motion.svg
+                key="stop"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                width="16" height="16" viewBox="0 0 16 16" fill="none"
+              >
+                {/* Pause icon */}
+                <rect x="3" y="2" width="4" height="12" rx="1.5" fill="white"/>
+                <rect x="9" y="2" width="4" height="12" rx="1.5" fill="white"/>
+              </motion.svg>
+            ) : (
+              <motion.svg
+                key="play"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                width="16" height="16" viewBox="0 0 16 16" fill="none"
+              >
+                {/* Play icon */}
+                <path d="M4 2.5 L13 8 L4 13.5 Z" fill="#3a9ab5"/>
+              </motion.svg>
+            )}
+          </AnimatePresence>
+
+          {/* Pulse ring when playing */}
+          {autoplay && (
+            <motion.div
+              className="absolute rounded-full"
+              style={{ width: '44px', height: '44px', border: '2px solid rgba(110,198,216,0.5)' }}
+              animate={{ scale: [1, 1.45, 1], opacity: [0.7, 0, 0.7] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
+        </motion.button>
       </div>
+
+      {/* Swipe hint — shown only once */}
+      <p className="text-center text-xs mt-2 font-body" style={{ color: 'rgba(58,154,181,0.6)' }}>
+        desliza para ver más fotos 👆
+      </p>
     </div>
   )
 }
