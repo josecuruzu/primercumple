@@ -30,105 +30,79 @@ export default function MessagesDisplay({ refresh }: { refresh: number }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 gap-3">
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-5xl"
-        >
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-5xl">
           🐠
         </motion.div>
-        <p className="font-body text-sm" style={{ color: '#6ec6d8' }}>
-          Cargando mensajes del fondo del mar...
-        </p>
-      </div>
-    )
-  }
-
-  if (messages.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-10 gap-3">
-        <span className="text-5xl">🐚</span>
-        <p className="font-bubble font-bold text-lg text-center" style={{ color: '#3a9ab5' }}>
-          ¡Sé el primero en dejar<br/>un mensaje para Gael!
-        </p>
+        <p className="font-body text-sm text-[#6ec6d8]">Cargando mensajes...</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-bubble font-bold text-2xl text-center" style={{ color: '#1d6d87' }}>
-        💌 Mensajitos con amor
-      </h2>
+    <div className="space-y-6">
       <AnimatePresence>
-{messages.map((msg, i) => (
-  <motion.div
-    key={msg.id}
-    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    transition={{ delay: i * 0.05, duration: 0.4 }}
-    className="rounded-3xl overflow-hidden relative mb-5 group" // 'group' para efectos al pasar el mouse si quieres
-    style={{
-      background: 'rgba(255,255,255,0.6)', // Más translúcido para que se vea el fondo marino
-      backdropFilter: 'blur(12px)',
-      border: '1.5px solid rgba(255,255,255,0.7)',
-      boxShadow: '0 10px 30px rgba(58,154,181,0.12)',
-    }}
-  >
-    {/* Contenedor Principal Adaptable */}
-    <div className="relative w-full flex flex-col">
-      
-      {msg.photo_url ? (
-        /* CASO CON FOTO: La foto manda en el tamaño */
-        <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] overflow-hidden"> 
-          {/* aspect-[3/4] es ideal para fotos verticales de móvil */}
-          <Image
-            src={msg.photo_url}
-            alt={`Foto de ${msg.guest_name}`}
-            fill
-            className="object-cover object-center transition-transform duration-500 group-hover:scale-105" 
-            // object-cover llena el espacio. object-center centra la cara.
-            unoptimized 
-          />
-          {/* Degradado oscuro superpuesto para legibilidad del texto */}
-          <div 
-            className="absolute inset-0 z-10"
+        {messages.map((msg, i) => (
+          <motion.div
+            key={msg.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="rounded-3xl overflow-hidden relative shadow-lg"
             style={{
-              background: 'linear-gradient(to top, rgba(13,74,98,0.9) 0%, rgba(13,74,98,0.5) 30%, transparent 60%)'
+              background: 'rgba(255,255,255,0.7)',
+              backdropFilter: 'blur(10px)',
+              border: '1.5px solid rgba(255,255,255,0.8)',
             }}
-          />
-        </div>
-      ) : (
-        /* CASO SIN FOTO: Espaciador decorativo mínimo */
-        <div className="pt-10 pb-2 text-center text-4xl opacity-15">🌊</div>
-      )}
+          >
+            <div className="relative w-full flex flex-col">
+              {/* Bloque de Imagen */}
+              {msg.photo_url ? (
+                <div className="relative w-full aspect-[3/4] overflow-hidden">
+                  <Image
+                    src={msg.photo_url}
+                    alt={msg.guest_name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                  {/* Overlay para "Subtítulos" */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-t from-[#0d4a62]/90 via-[#0d4a62]/40 to-transparent z-10" 
+                  />
+                </div>
+              ) : (
+                <div className="pt-8 pb-2 text-center text-3xl opacity-20">🌊</div>
+              )}
 
-      {/* Contenedor de Texto (Subtítulos) - Posicionado Absoluto sobre la foto o Relativo si no hay foto */}
-      <div className={`${msg.photo_url ? 'absolute bottom-0 left-0 right-0 z-20' : 'relative'} p-5`}>
-        
-        {/* Mensaje */}
-        <p className={`${msg.photo_url ? 'text-white' : 'text-[#0d4a62]'} font-body text-base leading-relaxed text-center mb-3 italic`}
-           style={{ 
-             textShadow: msg.photo_url ? '0 2px 4px rgba(0,0,0,0.6)' : 'none',
-             fontFamily: "'Nunito', sans-serif" 
-           }}>
-          "{msg.message}"
-        </p>
-        
-        {/* Info del Invitado (Nombre + Fecha alineados) */}
-        <div className="flex items-center justify-between gap-3 pt-2 border-t"
-             style={{ borderColor: msg.photo_url ? 'rgba(255,255,255,0.2)' : 'rgba(110,198,216,0.3)' }}>
-          
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-inner"
-              style={{
-                background: 'linear-gradient(135deg, #6ec6d8, #3a9ab5)',
-                color: 'white',
-                fontFamily: "'Baloo 2', cursive",
-              }}>
-              {msg.guest_name.charAt(0).toUpperCase()}
+              {/* Contenedor de Texto */}
+              <div className={msg.photo_url ? "absolute bottom-0 left-0 right-0 z-20 p-5" : "relative p-5"}>
+                <p 
+                  className={`text-center italic mb-4 font-medium ${msg.photo_url ? 'text-white' : 'text-[#0d4a62]'}`}
+                  style={{ textShadow: msg.photo_url ? '0 2px 4px rgba(0,0,0,0.5)' : 'none' }}
+                >
+                  "{msg.message}"
+                </p>
+
+                <div 
+                  className="flex items-center justify-between pt-3 border-t"
+                  style={{ borderColor: msg.photo_url ? 'rgba(255,255,255,0.2)' : 'rgba(110,198,216,0.3)' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#6ec6d8] to-[#3a9ab5] flex items-center justify-center text-white text-xs font-bold">
+                      {msg.guest_name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className={`font-bold text-sm ${msg.photo_url ? 'text-white' : 'text-[#1d6d87]'}`}>
+                      {msg.guest_name}
+                    </span>
+                  </div>
+                  <span className={`text-[10px] ${msg.photo_url ? 'text-white/70' : 'text-[#6ec6d8]'}`}>
+                    {new Date(msg.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
+                  </span>
+                </div>
+              </div>
             </div>
-            <p className={`font-bubble font
+          </motion.div>
+        ))}
       </AnimatePresence>
     </div>
   )
