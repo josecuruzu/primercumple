@@ -132,48 +132,46 @@ export default function HomePage() {
         </div>
         {/* --- NUEVA SECCIÓN: Texto Curvado + Título Gael --- */}
         <motion.div 
-  initial={{ opacity: 0, y: -30 }} 
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, type: 'spring' }} 
-  className="relative mt-2 flex flex-col items-center w-full"
->
-  <svg 
-    viewBox="0 0 500 150" // Aumentamos la altura para que no corte las letras
-    className="w-full max-w-[350px] -mb-4" // Un poco más ancho y margen negativo para unirlo a Gael
-    style={{ 
-      filter: 'drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 4px 6px rgba(110,198,216,0.3))'
-    }}
-  >
-    <defs>
-      <path 
-        id="curvePath" 
-        // Hemos ampliado el inicio (20) y el fin (480) para que quepa todo el texto
-        d="M 20,100 Q 250,10 480,100" 
-        fill="none" 
-      />
-    </defs>
-    
-    <text 
-      fill="#6ec6d8" 
-      className="font-sniglet font-extrabold"
-      style={{ fontSize: '44px' }} // Tamaño ajustado para Sniglet
-    >
-      <textPath 
-        xlinkHref="#curvePath" 
-        startOffset="50%" 
-        textAnchor="middle"
-      >
-        ¡Gracias por Venir!
-      </textPath>
-    </text>
-  </svg>
+          initial={{ opacity: 0, y: -30 }} 
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, type: 'spring' }} 
+          className="relative mt-2 flex flex-col items-center w-full"
+        >
+          <svg 
+            viewBox="0 0 500 150"
+            className="w-full max-w-[350px] -mb-4"
+            style={{ 
+              filter: 'drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 4px 6px rgba(110,198,216,0.3))'
+            }}
+          >
+            <defs>
+              <path 
+                id="curvePath" 
+                d="M 20,100 Q 250,10 480,100" 
+                fill="none" 
+              />
+            </defs>
+            <text 
+              fill="#6ec6d8" 
+              className="font-sniglet font-extrabold"
+              style={{ fontSize: '44px' }}
+            >
+              <textPath 
+                xlinkHref="#curvePath" 
+                startOffset="50%" 
+                textAnchor="middle"
+              >
+                ¡Gracias por Venir!
+              </textPath>
+            </text>
+          </svg>
 
-  <div className="relative z-10">
-    <GaelTitle />
-  </div>
-</motion.div>
+          <div className="relative z-10">
+            <GaelTitle />
+          </div>
+        </motion.div>
         {/* --- FIN DE LA NUEVA SECCIÓN --- */}
-       <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }} className="mt-1">
           <p className="font-bubble font-bold text-3xl" style={{
             color: '#3a9ab5',
@@ -200,124 +198,249 @@ export default function HomePage() {
 
         {/* Tabs */}
         <div className="flex rounded-2xl p-1 mb-6 gap-1" style={{
-  background: 'rgba(255,255,255,0.5)',
-  backdropFilter: 'blur(8px)',
-  border: '1.5px solid rgba(255,255,255,0.8)',
-}}>
-  {(['gallery', 'messages', 'games'] as Tab[]).map((tab) => (
-    <button 
-      key={tab} 
-      onClick={() => handleSwitchTab(tab)}
-      className="flex-1 py-3 rounded-xl font-bubble font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-1"
-      style={{
-        color: activeTab === tab ? 'white' : '#3a9ab5',
-        background: activeTab === tab ? 'linear-gradient(135deg, #6ec6d8, #3a9ab5)' : 'transparent',
-        boxShadow: activeTab === tab ? '0 4px 12px rgba(58,154,181,0.3)' : 'none',
-      }}>
-      {tab === 'gallery' && '📸 Fotos'}
-      {tab === 'messages' && '💌 Mensajes'}
-      {tab === 'games' && '🕹️ Juegos'}
-    </button>
-  ))}
-</div>
+          background: 'rgba(255,255,255,0.5)',
+          backdropFilter: 'blur(8px)',
+          border: '1.5px solid rgba(255,255,255,0.8)',
+        }}>
+          {(['gallery', 'messages', 'games'] as Tab[]).map((tab) => (
+            <button 
+              key={tab} 
+              onClick={() => handleSwitchTab(tab)}
+              className="flex-1 py-3 rounded-xl font-bubble font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-1"
+              style={{
+                color: activeTab === tab ? 'white' : '#3a9ab5',
+                background: activeTab === tab ? 'linear-gradient(135deg, #6ec6d8, #3a9ab5)' : 'transparent',
+                boxShadow: activeTab === tab ? '0 4px 12px rgba(58,154,181,0.3)' : 'none',
+              }}>
+              {tab === 'gallery' && '📸 Fotos'}
+              {tab === 'messages' && '💌 Mensajes'}
+              {tab === 'games' && '🕹️ Juegos'}
+            </button>
+          ))}
+        </div>
 
         <AnimatePresence mode="wait">
-          {activeTab === 'gallery' ? (
+          {activeTab === 'gallery' && (
             <motion.div key="gallery"
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
               <PhotoGallery />
             </motion.div>
-          ) : (
+          )}
+
+          {activeTab === 'messages' && (
             <motion.div key="messages"
               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
               <MessagesDisplay refresh={refreshMessages} />
             </motion.div>
-            /* --- SECCIÓN DE JUEGOS --- */
-    <motion.div 
-      key="games" 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
-      exit={{ opacity: 0, y: 20 }}
-      className="flex flex-col gap-4"
-    >
-      <h2 className="font-bubble font-bold text-2xl text-center mb-2" style={{ color: '#1d6d87' }}>
-        ¡A jugar con Gael! 🦀
-      </h2>
-      
-      {/* Botón Pez Saltarín */}
-      <a 
-        href="https://gael-flappy.vercel.app/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
-        style={{
-          background: 'linear-gradient(135deg, #6ec6d8 0%, #3a9ab5 100%)',
-          boxShadow: '0 8px 20px rgba(58,154,181,0.3)',
-        }}
-        onClick={() => sfx.pop()}
-      >
-        <span className="text-3xl">🐟</span>
-        Pez Saltarín
-      </a>
+          )}
 
-      {/* Botón Burbujas */}
-      <a 
-        href="https://bubble-game-gael.vercel.app/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
-        style={{
-          background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
-          boxShadow: '0 8px 20px rgba(240,107,138,0.3)',
-        }}
-        onClick={() => sfx.pop()}
-      >
-        <span className="text-3xl">🫧</span>
-        Burbujas
-      </a>
+          {/* --- SECCIÓN DE JUEGOS --- */}
+          {activeTab === 'games' && (
+            <motion.div
+              key="games"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="flex flex-col gap-4"
+            >
+              <h2 className="font-bubble font-bold text-2xl text-center mb-2" style={{ color: '#1d6d87' }}>
+                ¡A jugar con Gael! 🦀
+              </h2>
 
-      <p className="text-center text-[#1d6d87]/60 text-sm italic mt-2 font-body">
-        Los juegos se abrirán en una pestaña nueva
-      </p>
-    </motion.div>
+              {/* Botón Pez Saltarín */}
+              <a
+                href="https://gael-flappy.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #6ec6d8 0%, #3a9ab5 100%)',
+                  boxShadow: '0 8px 20px rgba(58,154,181,0.3)',
+                }}
+                onClick={() => sfx.pop()}
+              >
+                <span className="text-3xl">🐟</span>
+                Pez Saltarín
+              </a>
+
+              {/* Botón Burbujas */}
+              <a
+                href="https://bubble-game-gael.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
+                  boxShadow: '0 8px 20px rgba(240,107,138,0.3)',
+                }}
+                onClick={() => sfx.pop()}
+              >
+                <span className="text-3xl">🫧</span>
+                Burbujas
+              </a>
+
+              <p className="text-center text-[#1d6d87]/60 text-sm italic mt-2 font-body">
+                Los juegos se abrirán en una pestaña nueva
+              </p>
+            </motion.div>
           )}
         </AnimatePresence>
       </main>
 
       {/* ── FAB ── */}
       <AnimatePresence>
-  {activeTab === 'messages' && (
-    <motion.div 
-      className="fixed bottom-0 left-0 right-0 flex justify-center z-30 px-4"
-      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 24px)' }}
-      initial={{ y: 100, opacity: 0 }} 
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: 100, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-    >
-      <motion.button 
-        whileTap={{ scale: 0.96 }} 
-        onClick={handleOpenForm}
-        className="w-full max-w-sm py-4 rounded-2xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-3"
-        style={{
-          background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
-          boxShadow: '0 8px 32px rgba(240,107,138,0.5)',
-        }}
-      >
-        <motion.span animate={{ rotate: [0, -10, 10, -10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
-          💌
-        </motion.span>
-        Dejar mi mensaje
-        <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-          <FishColor style={{ width: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}/>
-        </motion.div>
-      </motion.button>
-    </motion.div>
-  )}
-</AnimatePresence>
+        {activeTab === 'messages' && (
+          <motion.div
+            className="fixed bottom-0 left-0 right-0 flex justify-center z-30 px-4"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 24px)' }}
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          >
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={handleOpenForm}
+              className="w-full max-w-sm py-4 rounded-2xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-3"
+              style={{
+                background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
+                boxShadow: '0 8px 32px rgba(240,107,138,0.5)',
+              }}
+            >
+              <motion.span animate={{ rotate: [0, -10, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
+                💌
+              </motion.span>
+              Dejar mi mensaje
+              <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                <FishColor style={{ width: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}/>
+              </motion.div>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {showForm && (
+        <MessageForm
+          onClose={() => { setShowForm(false) }}
+          onSuccess={() => { setRefreshMessages(r => r + 1); setActiveTab('messages') }}
+        />
+      )}
+    </div>
+  )
+} ? '0 4px 12px rgba(58,154,181,0.3)' : 'none',
+              }}>
+              {tab === 'gallery' && '📸 Fotos'}
+              {tab === 'messages' && '💌 Mensajes'}
+              {tab === 'games' && '🕹️ Juegos'}
+            </button>
+          ))}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {activeTab === 'gallery' && (
+            <motion.div key="gallery"
+              initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
+              <PhotoGallery />
+            </motion.div>
+          )}
+
+          {activeTab === 'messages' && (
+            <motion.div key="messages"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <MessagesDisplay refresh={refreshMessages} />
+            </motion.div>
+          )}
+
+          {/* --- SECCIÓN DE JUEGOS --- */}
+          {activeTab === 'games' && (
+            <motion.div 
+              key="games" 
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: 20 }}
+              className="flex flex-col gap-4"
+            >
+              <h2 className="font-bubble font-bold text-2xl text-center mb-2" style={{ color: '#1d6d87' }}>
+                ¡A jugar con Gael! 🦀
+              </h2>
+              
+              {/* Botón Pez Saltarín */}
+              <a 
+                href="https://gael-flappy.vercel.app/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #6ec6d8 0%, #3a9ab5 100%)',
+                  boxShadow: '0 8px 20px rgba(58,154,181,0.3)',
+                }}
+                onClick={() => sfx.pop()}
+              >
+                <span className="text-3xl">🐟</span>
+                Pez Saltarín
+              </a>
+
+              {/* Botón Burbujas */}
+              <a 
+                href="https://bubble-game-gael.vercel.app/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
+                  boxShadow: '0 8px 20px rgba(240,107,138,0.3)',
+                }}
+                onClick={() => sfx.pop()}
+              >
+                <span className="text-3xl">🫧</span>
+                Burbujas
+              </a>
+
+              <p className="text-center text-[#1d6d87]/60 text-sm italic mt-2 font-body">
+                Los juegos se abrirán en una pestaña nueva
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* ── FAB ── */}
+      <AnimatePresence>
+        {activeTab === 'messages' && (
+          <motion.div 
+            className="fixed bottom-0 left-0 right-0 flex justify-center z-30 px-4"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 24px)' }}
+            initial={{ y: 100, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          >
+            <motion.button 
+              whileTap={{ scale: 0.96 }} 
+              onClick={handleOpenForm}
+              className="w-full max-w-sm py-4 rounded-2xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-3"
+              style={{
+                background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
+                boxShadow: '0 8px 32px rgba(240,107,138,0.5)',
+              }}
+            >
+              <motion.span animate={{ rotate: [0, -10, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
+                💌
+              </motion.span>
+              Dejar mi mensaje
+              <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                <FishColor style={{ width: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}/>
+              </motion.div>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {showForm && (
         <MessageForm
