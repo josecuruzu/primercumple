@@ -53,7 +53,12 @@ function TopBottomAnimals({ idx }: { idx: number }) {
 
       {/* Fila Inferior */}
       <div className="absolute left-0 right-0 z-10 pointer-events-none flex items-center justify-around px-8"
-        style={{ bottom: 0, height: '27%', background: 'linear-gradient(to top,rgba(0,0,0,0.18) 0%,transparent 100%)' }}>
+  style={{ 
+    bottom: 0, 
+    height: '25%', // Reducimos un poco la altura total
+    paddingBottom: '12px', // <--- Añadimos este margen interno para iPhone
+    background: 'linear-gradient(to top,rgba(0,0,0,0.18) 0%,transparent 100%)' 
+  }}>
         {bottomRow.map((src, i) => (
           <motion.div key={`bottom-${i}`}
             animate={{ y: [0, 8, 0] }}
@@ -94,15 +99,22 @@ function PhotoSlide({ src, index, isActive }: { src: string; index: number; isAc
       {/* Real photo */}
       {!error && (
         <Image
-          src={src}
-          alt={caption}
-          fill
-          sizes="(max-width: 768px) 100vw, 700px"
-          priority={index === 0}
-          style={{ objectFit: 'contain', objectPosition: 'center' }}
-          onLoad={handleLoad}
-          onError={() => setError(true)}
-        />
+  src={src}
+  alt={caption}
+  fill
+  sizes="(max-width: 768px) 100vw, 700px"
+  priority={index === 0}
+  // Añadimos 'top-0 left-0' para resetear cualquier offset de Safari
+  className="top-0 left-0" 
+  style={{ 
+    objectFit: 'contain', 
+    objectPosition: 'center',
+    // Forzamos que la imagen no intente expandirse más allá de los bordes redondeados
+    transform: 'translate3d(0,0,0)' 
+  }}
+  onLoad={handleLoad}
+  onError={() => setError(true)}
+/>
       )}
 
       {/* Placeholder while loading */}
@@ -250,12 +262,20 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
       {fetchStatus === 'ready' && (
         <>
           {/* Container portrait-shaped: 1363×2048 */}
-          <div style={{
-            width: '100%', aspectRatio: '1363/2048', maxHeight: '72dvh',
-            position: 'relative', borderRadius: '20px', overflow: 'hidden',
-            boxShadow: '0 10px 40px rgba(13,74,98,0.28)',
-            border: '3px solid rgba(255,255,255,0.88)',
-          }}>
+          ´{/* Container portrait-shaped: 1363×2048 */}
+<div style={{
+  width: '100%', 
+  aspectRatio: '1363/2048', 
+  maxHeight: '70dvh', // Bajamos de 72 a 70 para dar aire en Safari iOS
+  position: 'relative', 
+  borderRadius: '20px', 
+  overflow: 'hidden',
+  boxShadow: '0 10px 40px rgba(13,74,98,0.28)',
+  border: '3px solid rgba(255,255,255,0.88)',
+  // Esta línea es clave para iPhone:
+  isolation: 'isolate', 
+  WebkitMaskImage: '-webkit-radial-gradient(white, black)' 
+}}>
             <div ref={emblaRef} style={{ width:'100%', height:'100%', overflow:'hidden' }}>
               <div style={{ display:'flex', height:'100%' }}>
                 {photos.map((src, index) => (
