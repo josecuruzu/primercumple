@@ -16,7 +16,7 @@
 
 * {
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  /* NOTE: do NOT set touch-action here — would block Embla swipe */
 }
 
 html, body {
@@ -77,20 +77,10 @@ textarea {
   font-size: 16px !important; /* Prevents zoom on iOS */
 }
 
-/* Embla carousel */
-.embla {
-  overflow: hidden;
-}
-.embla__container {
-  display: flex;
-  align-items: stretch; /* all slides same height */
-  height: 100%;
-}
-.embla__slide {
-  flex: 0 0 100%;
-  min-width: 0;
-  height: 100%;
-}
+/* Embla carousel — minimal, swipe handled natively */
+.embla { overflow: hidden; }
+.embla__container { display: flex; height: 100%; }
+.embla__slide { flex: 0 0 100%; min-width: 0; height: 100%; }
 
 /* Animated seaweed */
 @keyframes sway {
