@@ -91,31 +91,39 @@ function PhotoSlide({ src, index, isActive }: { src: string; index: number; isAc
   const caption = ""
 
   return (
-    <div className="relative w-full h-full" style={{ background: bg }}>
+    // Dentro de PhotoSlide
+<div className="relative w-full h-full" style={{ 
+  background: bg,
+  display: 'flex',      // <--- Forzamos flex para control total
+  alignItems: 'center', // <--- Centrado vertical riguroso
+  justifyContent: 'center',
+  overflow: 'hidden'    // <--- Evita cualquier sangrado de la imagen
+}}>
 
       {/* Top/bottom animals for landscape photos — detected automatically */}
       {isLandscape && loaded && !error && <TopBottomAnimals idx={index} />}
 
       {/* Real photo */}
       {!error && (
-        <Image
-  src={src}
-  alt={caption}
-  fill
-  sizes="(max-width: 768px) 100vw, 700px"
-  priority={index === 0}
-  // Añadimos 'top-0 left-0' para resetear cualquier offset de Safari
-  className="top-0 left-0" 
-  style={{ 
-    objectFit: 'contain', 
-    objectPosition: 'center',
-    // Forzamos que la imagen no intente expandirse más allá de los bordes redondeados
-    transform: 'translate3d(0,0,0)' 
-  }}
-  onLoad={handleLoad}
-  onError={() => setError(true)}
-/>
-      )}
+  <Image
+    src={src}
+    alt={caption}
+    fill
+    sizes="(max-width: 768px) 100vw, 700px"
+    priority={index === 0}
+    className="m-0 p-0" // <--- Elimina cualquier margen/padding residual
+    style={{ 
+      objectFit: 'contain', 
+      objectPosition: 'center',
+      top: 0,     // <--- Forzado manual de coordenadas
+      left: 0,
+      width: '100%',
+      height: '100%'
+    }}
+    onLoad={handleLoad}
+    onError={() => setError(true)}
+  />
+)}
 
       {/* Placeholder while loading */}
       {(!loaded || error) && (
@@ -279,14 +287,20 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
             <div ref={emblaRef} style={{ width:'100%', height:'100%', overflow:'hidden' }}>
               <div style={{ display:'flex', height:'100%' }}>
                 {photos.map((src, index) => (
-                  <div key={src} style={{ flex:'0 0 100%', minWidth:0, height:'100%', position:'relative' }}>
-                    <motion.div style={{ width:'100%', height:'100%' }}
-                      animate={{ scale: index===selectedIndex ? 1 : 0.97, opacity: index===selectedIndex ? 1 : 0.55 }}
-                      transition={{ duration: 0.3 }}>
-                      <PhotoSlide src={src} index={index} isActive={index===selectedIndex} />
-                    </motion.div>
-                  </div>
-                ))}
+  <div key={src} style={{ 
+    flex: '0 0 100%', 
+    minWidth: 0, 
+    height: '100%', 
+    position: 'relative',
+    display: 'block' // <--- Asegura que no se comporte como inline
+  }}>
+    <motion.div style={{ width: '100%', height: '100%', display: 'block' }}
+      animate={{ scale: index === selectedIndex ? 1 : 0.97, opacity: index === selectedIndex ? 1 : 0.55 }}
+      transition={{ duration: 0.3 }}>
+      <PhotoSlide src={src} index={index} isActive={index === selectedIndex} />
+    </motion.div>
+  </div>
+))}
               </div>
             </div>
           </div>
