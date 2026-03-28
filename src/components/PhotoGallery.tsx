@@ -24,29 +24,42 @@ const TOP_ANIMALS    = ['/animals/estrella_De_mar.png', '/animals/medusa.png',  
 const BOTTOM_ANIMALS = ['/animals/cangrejo.png',        '/animals/seahorse.png', '/animals/erizo_de_mar.png']
 
 function TopBottomAnimals({ idx }: { idx: number }) {
-  const top    = TOP_ANIMALS[idx % TOP_ANIMALS.length]
-  const bottom = BOTTOM_ANIMALS[idx % BOTTOM_ANIMALS.length]
+  // Función auxiliar para obtener 3 animales distintos basados en el índice de la slide
+  const getDistinctAnimals = (sourceArray: string[], slideIdx: number) => {
+    return [0, 1, 2].map((pos) => {
+      // Usamos el índice de la slide + la posición (0, 1 o 2) para rotar la selección
+      const animalIdx = (slideIdx + pos) % sourceArray.length;
+      return sourceArray[animalIdx];
+    });
+  };
+
+  const topRow = getDistinctAnimals(TOP_ANIMALS, idx);
+  const bottomRow = getDistinctAnimals(BOTTOM_ANIMALS, idx);
+
   return (
     <>
+      {/* Fila Superior */}
       <div className="absolute left-0 right-0 z-10 pointer-events-none flex items-center justify-around px-8"
         style={{ top: 0, height: '27%', background: 'linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,transparent 100%)' }}>
-        {[0,1,2].map(i => (
-          <motion.div key={i}
-            animate={{ y: [0,-8,0] }}
-            transition={{ duration: 3+i*0.8, repeat: Infinity, delay: i*0.9, ease: 'easeInOut' }}>
-            <Image src={top} alt="" width={58} height={58}
-              style={{ objectFit:'contain', filter:'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}/>
+        {topRow.map((src, i) => (
+          <motion.div key={`top-${i}`}
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3 + i * 0.8, repeat: Infinity, delay: i * 0.9, ease: 'easeInOut' }}>
+            <Image src={src} alt="" width={58} height={58}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }} />
           </motion.div>
         ))}
       </div>
+
+      {/* Fila Inferior */}
       <div className="absolute left-0 right-0 z-10 pointer-events-none flex items-center justify-around px-8"
         style={{ bottom: 0, height: '27%', background: 'linear-gradient(to top,rgba(0,0,0,0.18) 0%,transparent 100%)' }}>
-        {[0,1,2].map(i => (
-          <motion.div key={i}
-            animate={{ y: [0,8,0] }}
-            transition={{ duration: 3.5+i*0.7, repeat: Infinity, delay: i*1.1, ease: 'easeInOut' }}>
-            <Image src={bottom} alt="" width={58} height={58}
-              style={{ objectFit:'contain', filter:'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }}/>
+        {bottomRow.map((src, i) => (
+          <motion.div key={`bottom-${i}`}
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 3.5 + i * 0.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }}>
+            <Image src={src} alt="" width={58} height={58}
+              style={{ objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.3))' }} />
           </motion.div>
         ))}
       </div>
