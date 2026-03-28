@@ -74,7 +74,6 @@ function TopBottomAnimals({ idx }: { idx: number }) {
     </>
   )
 }
-// ── Single slide ──
 function LeftRightAnimals({ idx }: { idx: number }) {
   // Función auxiliar para obtener animales distintos (misma lógica que la anterior)
   const getDistinctAnimals = (sourceArray: string[], slideIdx: number) => {
@@ -88,39 +87,33 @@ function LeftRightAnimals({ idx }: { idx: number }) {
   const rightColumn = getDistinctAnimals(RIGHT_ANIMALS, idx);
 
   // Estilo base para las columnas laterales
-  const columnStyle = "absolute top-0 bottom-0 z-10 pointer-events-none flex flex-col justify-around py-12 px-2";
+  const columnStyle = "absolute top-0 bottom-0 z-10 pointer-events-none flex flex-col items-center justify-around py-12";
 
   return (
     <>
       {/* Columna Izquierda */}
-      <div className={`${columnStyle} left-0 items-start`} // <-- Añadimos 'items-start' (alinear a la izq)
-        style={{ 
-          width: '12%', // <-- Reducimos el ancho del contenedor de 22% a 12%
-          background: 'linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 100%)' 
-        }}>
+      <div className={`${columnStyle} left-0`}
+        style={{ width: '22%', background: 'linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 100%)' }}>
         {leftColumn.map((src, i) => (
           <motion.div key={`left-${i}`}
             // Movimiento lateral suave
             animate={{ x: [0, 6, 0] }}
             transition={{ duration: 4 + i * 0.5, repeat: Infinity, delay: i * 0.7, ease: 'easeInOut' }}>
-            <Image src={src} alt="" width={40} height={40} // <-- Reducimos un poco el tamaño de 52 a 40 para que quepan bien
+            <Image src={src} alt="" width={52} height={52}
               style={{ objectFit: 'contain', filter: 'drop-shadow(2px 3px 6px rgba(0,0,0,0.3))' }} />
           </motion.div>
         ))}
       </div>
 
       {/* Columna Derecha */}
-      <div className={`${columnStyle} right-0 items-end`} // <-- Añadimos 'items-end' (alinear a la der)
-        style={{ 
-          width: '12%', // <-- Reducimos el ancho del contenedor de 22% a 12%
-          background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 100%)' 
-        }}>
+      <div className={`${columnStyle} right-0`}
+        style={{ width: '22%', background: 'linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 100%)' }}>
         {rightColumn.map((src, i) => (
           <motion.div key={`right-${i}`}
             // Movimiento lateral suave (inverso)
             animate={{ x: [0, -6, 0] }}
             transition={{ duration: 3.8 + i * 0.6, repeat: Infinity, delay: i * 0.8, ease: 'easeInOut' }}>
-            <Image src={src} alt="" width={40} height={40} // <-- Reducimos un poco el tamaño de 52 a 40
+            <Image src={src} alt="" width={52} height={52}
               style={{ objectFit: 'contain', filter: 'drop-shadow(-2px 3px 6px rgba(0,0,0,0.3))' }} />
           </motion.div>
         ))}
