@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Sniglet:wght@800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  --background: #d8f2f8;
+  --foreground: #1d6d87;
   --ocean-lightest: #e8f7f9;
   --ocean-light: #b8e8f0;
   --ocean-mid: #6ec6d8;
@@ -22,6 +24,7 @@
 html, body {
   overscroll-behavior: none;
   background: var(--ocean-lightest);
+  font-family: 'Nunito', sans-serif;
 }
 
 /* Custom scrollbar */
@@ -180,4 +183,7 @@ textarea {
 
 .mb-safe {
   margin-bottom: env(safe-area-inset-bottom, 20px);
+}
+.font-sniglet {
+  font-family: 'Sniglet', cursive;
 }

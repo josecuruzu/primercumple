@@ -130,13 +130,54 @@ export default function HomePage() {
         <div className="absolute top-4 right-3 animate-float-slow" style={{ animationDelay: '1s' }}>
           <Seahorse style={{ width: '50px', filter: 'drop-shadow(0 3px 6px rgba(200,130,50,0.25))' }}/>
         </div>
+        {/* --- NUEVA SECCIÓN: Texto Curvado + Título Gael --- */}
+        <motion.div 
+          initial={{ opacity: 0, y: -30 }} 
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, type: 'spring' }} 
+          className="relative mt-2 flex flex-col items-center" // Flex col para alinear SVG sobre GaelTitle
+        >
+          {/* SVG para el Texto en Arco "¡Gracias por Venir!" */}
+          <svg 
+            viewBox="0 0 500 120" // Ajusta la viewBox para controlar el tamaño y la curvatura
+            className="w-full max-w-[320px] -mb-1" // Controla el ancho del arco y el margen inferior negativo para acercarlo a GaelTitle
+            style={{ 
+              filter: 'drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 4px 6px rgba(110,198,216,0.3))'
+              // Este filtro genera el borde blanco alrededor del texto (similar a un stroke pero más limpio para textoPath)
+            }}
+          >
+            {/* Definir el camino invisible (Arco) */}
+            <defs>
+              <path 
+                id="curvePath" 
+                // M (Moveto), Q (Quadratic Bezier Curveto) -> M startX startY Q controlX controlY endX endY
+                d="M 50,90 Q 250,10 450,90" 
+                fill="none" 
+              />
+            </defs>
+            
+            {/* Texto que sigue el camino */}
+            <text 
+              className="font-sniglet font-extrabold text-5xl" // Clases para fuente, peso y tamaño del SVG text
+              fill="#6ec6d8" // Tono celeste armonioso de tu app
+              textAnchor="middle" // Centrar el texto en el camino
+            >
+              <textPath 
+                xlinkHref="#curvePath" 
+                startOffset="50%" // Empieza en la mitad del camino
+              >
+                ¡Gracias por Venir!
+              </textPath>
+            </text>
+          </svg>
 
-        <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: 'spring' }} className="mt-4">
-          <GaelTitle />
+          {/* Tu Título Gael Actual (ajustado margen superior) */}
+          <div className="-mt-1"> {/* Pequeño ajuste de margen negativo si es necesario */}
+            <GaelTitle />
+          </div>
         </motion.div>
-
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+        {/* --- FIN DE LA NUEVA SECCIÓN --- */}
+       <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }} className="mt-1">
           <p className="font-bubble font-bold text-3xl" style={{
             color: '#3a9ab5',
