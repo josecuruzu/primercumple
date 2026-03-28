@@ -198,26 +198,37 @@ export default function HomePage() {
       </main>
 
       {/* ── FAB ── */}
-      <motion.div className="fixed bottom-0 left-0 right-0 flex justify-center z-30 px-4"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 24px)' }}
-        initial={{ y: 100 }} animate={{ y: 0 }}
-        transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}>
-        <motion.button whileTap={{ scale: 0.96 }} onClick={handleOpenForm}
-          className="w-full max-w-sm py-4 rounded-2xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-3"
-          style={{
-            background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
-            boxShadow: '0 8px 32px rgba(240,107,138,0.5)',
-          }}>
-          <motion.span animate={{ rotate: [0, -10, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
-            💌
-          </motion.span>
-          Dejar mi mensaje
-          <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-            <FishColor style={{ width: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}/>
-          </motion.div>
-        </motion.button>
-      </motion.div>
+      <AnimatePresence>
+  {activeTab === 'messages' && (
+    <motion.div 
+      className="fixed bottom-0 left-0 right-0 flex justify-center z-30 px-4"
+      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 24px)' }}
+      initial={{ y: 100, opacity: 0 }} 
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 100, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+    >
+      <motion.button 
+        whileTap={{ scale: 0.96 }} 
+        onClick={handleOpenForm}
+        className="w-full max-w-sm py-4 rounded-2xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-3"
+        style={{
+          background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
+          boxShadow: '0 8px 32px rgba(240,107,138,0.5)',
+        }}
+      >
+        <motion.span animate={{ rotate: [0, -10, 10, -10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
+          💌
+        </motion.span>
+        Dejar mi mensaje
+        <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+          <FishColor style={{ width: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}/>
+        </motion.div>
+      </motion.button>
+    </motion.div>
+  )}
+</AnimatePresence>
 
       {showForm && (
         <MessageForm
