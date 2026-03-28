@@ -90,12 +90,14 @@ export default function MessagesDisplay({ refresh }: { refresh: number }) {
                 {msg.photo_url ? (
                   <div className="relative w-full aspect-[3/4] overflow-hidden">
                     <Image
-                      src={msg.photo_url}
-                      alt={msg.guest_name}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
+  src={msg.photo_url}
+  alt={msg.guest_name}
+  fill
+  className="object-cover"
+  unoptimized
+  priority={i < 2} // Carga con prioridad las primeras 2 imágenes del carrusel
+  sizes="(max-width: 768px) 85vw, 320px" // Ayuda al navegador a reservar el espacio exacto
+/>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0d4a62]/90 via-[#0d4a62]/20 to-transparent z-10" />
                   </div>
                 ) : (
