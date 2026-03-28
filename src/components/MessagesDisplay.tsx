@@ -30,18 +30,38 @@ export default function MessagesDisplay({ refresh }: { refresh: number }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 gap-3">
-        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-5xl">
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="text-5xl"
+        >
           🐠
         </motion.div>
-        <p className="font-body text-sm text-[#6ec6d8]">Cargando mensajes...</p>
+        <p className="font-body text-sm" style={{ color: '#6ec6d8' }}>
+          Cargando mensajes del fondo del mar...
+        </p>
+      </div>
+    )
+  }
+
+  if (messages.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 gap-3">
+        <span className="text-5xl">🐚</span>
+        <p className="font-bubble font-bold text-lg text-center" style={{ color: '#3a9ab5' }}>
+          ¡Sé el primero en dejar<br/>un mensaje para Gael!
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      <h2 className="font-bubble font-bold text-2xl text-center" style={{ color: '#1d6d87' }}>
+        💌 Mensajitos con amor
+      </h2>
       <AnimatePresence>
-        {messages.map((msg, i) => (
+     {messages.map((msg, i) => (
           <motion.div
             key={msg.id}
             initial={{ opacity: 0, y: 20 }}
