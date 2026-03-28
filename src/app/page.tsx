@@ -14,7 +14,7 @@ import MessagesDisplay from '@/components/MessagesDisplay'
 import MusicToggle from '@/components/MusicToggle'
 import { sfx } from '@/lib/audio'
 
-type Tab = 'gallery' | 'messages'
+type Tab = 'gallery' | 'messages'| 'games'
 
 function Plant({ src, alt, width, height, className = '', style }: {
   src: string; alt: string; width: number; height: number;
@@ -199,23 +199,27 @@ export default function HomePage() {
       <main className="relative z-20 px-4 pb-44 max-w-lg mx-auto">
 
         {/* Tabs */}
-        <div className="flex rounded-2xl p-1 mb-6" style={{
-          background: 'rgba(255,255,255,0.5)',
-          backdropFilter: 'blur(8px)',
-          border: '1.5px solid rgba(255,255,255,0.8)',
-        }}>
-          {(['gallery', 'messages'] as Tab[]).map((tab) => (
-            <button key={tab} onClick={() => handleSwitchTab(tab)}
-              className="flex-1 py-3 rounded-xl font-bubble font-bold text-base transition-all duration-300"
-              style={{
-                color: activeTab === tab ? 'white' : '#3a9ab5',
-                background: activeTab === tab ? 'linear-gradient(135deg, #6ec6d8, #3a9ab5)' : 'transparent',
-                boxShadow: activeTab === tab ? '0 4px 12px rgba(58,154,181,0.3)' : 'none',
-              }}>
-              {tab === 'gallery' ? '📸 Fotos' : '💌 Mensajes'}
-            </button>
-          ))}
-        </div>
+        <div className="flex rounded-2xl p-1 mb-6 gap-1" style={{
+  background: 'rgba(255,255,255,0.5)',
+  backdropFilter: 'blur(8px)',
+  border: '1.5px solid rgba(255,255,255,0.8)',
+}}>
+  {(['gallery', 'messages', 'games'] as Tab[]).map((tab) => (
+    <button 
+      key={tab} 
+      onClick={() => handleSwitchTab(tab)}
+      className="flex-1 py-3 rounded-xl font-bubble font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-1"
+      style={{
+        color: activeTab === tab ? 'white' : '#3a9ab5',
+        background: activeTab === tab ? 'linear-gradient(135deg, #6ec6d8, #3a9ab5)' : 'transparent',
+        boxShadow: activeTab === tab ? '0 4px 12px rgba(58,154,181,0.3)' : 'none',
+      }}>
+      {tab === 'gallery' && '📸 Fotos'}
+      {tab === 'messages' && '💌 Mensajes'}
+      {tab === 'games' && '🕹️ Juegos'}
+    </button>
+  ))}
+</div>
 
         <AnimatePresence mode="wait">
           {activeTab === 'gallery' ? (
@@ -230,6 +234,54 @@ export default function HomePage() {
               exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
               <MessagesDisplay refresh={refreshMessages} />
             </motion.div>
+            /* --- SECCIÓN DE JUEGOS --- */
+    <motion.div 
+      key="games" 
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      exit={{ opacity: 0, y: 20 }}
+      className="flex flex-col gap-4"
+    >
+      <h2 className="font-bubble font-bold text-2xl text-center mb-2" style={{ color: '#1d6d87' }}>
+        ¡A jugar con Gael! 🦀
+      </h2>
+      
+      {/* Botón Pez Saltarín */}
+      <a 
+        href="https://gael-flappy.vercel.app/" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
+        style={{
+          background: 'linear-gradient(135deg, #6ec6d8 0%, #3a9ab5 100%)',
+          boxShadow: '0 8px 20px rgba(58,154,181,0.3)',
+        }}
+        onClick={() => sfx.pop()}
+      >
+        <span className="text-3xl">🐟</span>
+        Pez Saltarín
+      </a>
+
+      {/* Botón Burbujas */}
+      <a 
+        href="https://bubble-game-gael.vercel.app/" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="w-full py-6 rounded-3xl font-bubble font-extrabold text-xl text-white flex items-center justify-center gap-4 transition-transform active:scale-95"
+        style={{
+          background: 'linear-gradient(135deg, #f06b8a 0%, #e04868 100%)',
+          boxShadow: '0 8px 20px rgba(240,107,138,0.3)',
+        }}
+        onClick={() => sfx.pop()}
+      >
+        <span className="text-3xl">🫧</span>
+        Burbujas
+      </a>
+
+      <p className="text-center text-[#1d6d87]/60 text-sm italic mt-2 font-body">
+        Los juegos se abrirán en una pestaña nueva
+      </p>
+    </motion.div>
           )}
         </AnimatePresence>
       </main>
