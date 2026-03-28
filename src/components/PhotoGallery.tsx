@@ -92,13 +92,12 @@ function PhotoSlide({ src, index, isActive }: { src: string; index: number; isAc
 
   return (
     // Dentro de PhotoSlide
-<div className="relative w-full h-full" style={{ 
-  background: bg,
-  display: 'flex',      // <--- Forzamos flex para control total
-  alignItems: 'center', // <--- Centrado vertical riguroso
-  justifyContent: 'center',
-  overflow: 'hidden'    // <--- Evita cualquier sangrado de la imagen
-}}>
+<div className="absolute inset-0 w-full h-full" style={{ 
+      background: bg,
+      display: 'flex',
+      flexDirection: 'column', // Asegura que los elementos se apilen verticalmente sin desbordar
+      overflow: 'hidden'
+    }}>
 
       {/* Top/bottom animals for landscape photos — detected automatically */}
       {isLandscape && loaded && !error && <TopBottomAnimals idx={index} />}
@@ -168,7 +167,7 @@ function GalleryLoading() {
     <div className="w-full flex flex-col items-center justify-center gap-4 py-16"
       style={{ aspectRatio: '1363/2048', maxHeight: '72dvh',
         background: 'rgba(255,255,255,0.35)', borderRadius: '20px',
-        border: '3px solid rgba(255,255,255,0.88)' }}>
+        border: '3px solid rgba(255,255,255,0.88)',boxSizing: 'border-box' }}>
       <motion.div animate={{ y: [0,-14,0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
         <Image src="/animals/ballena.png" alt="" width={110} height={76} style={{ objectFit: 'contain' }}/>
       </motion.div>
@@ -269,20 +268,19 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
       {/* ── Carousel — only when photos are ready ── */}
       {fetchStatus === 'ready' && (
         <>
-          {/* Container portrait-shaped: 1363×2048 */}
-          ´{/* Container portrait-shaped: 1363×2048 */}
+{/* Container portrait-shaped */}
 <div style={{
-  width: '100%', 
-  aspectRatio: '1363/2048', 
-  maxHeight: '70dvh', // Bajamos de 72 a 70 para dar aire en Safari iOS
-  position: 'relative', 
-  borderRadius: '20px', 
+  width: '100%',
+  // Eliminamos aspectRatio: '1363/2048' si da problemas y usamos una altura fija basada en el viewport
+  height: '65dvh', // Usamos una altura fija relativa a la pantalla
+  maxHeight: '550px', // Opcional: un tope físico para que no sea gigante en pantallas grandes
+  position: 'relative',
+  borderRadius: '20px',
   overflow: 'hidden',
   boxShadow: '0 10px 40px rgba(13,74,98,0.28)',
   border: '3px solid rgba(255,255,255,0.88)',
-  // Esta línea es clave para iPhone:
-  isolation: 'isolate', 
-  WebkitMaskImage: '-webkit-radial-gradient(white, black)' 
+  isolation: 'isolate',
+  zIndex: 1
 }}>
             <div ref={emblaRef} style={{ width:'100%', height:'100%', overflow:'hidden' }}>
               <div style={{ display:'flex', height:'100%' }}>
@@ -306,7 +304,7 @@ export default function PhotoGallery({ onNav }: { onNav?: () => void }) {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-4 mt-4">
+          <div className="flex items-center justify-center gap-4 mt-2" style={{ minHeight: '50px' }}>
             {/* Dots — max 7 visible to avoid overflow */}
             <div className="flex gap-2 items-center">
               {photos.slice(0, 7).map((_, i) => (
